@@ -1,6 +1,0 @@
-//interface?
-public class Vector{
-
-
-
-}
