@@ -4,6 +4,11 @@ public class ComplexNumber implements VectorEntry<ComplexNumber>{
     private Fraction realPart;
     private Fraction imaginaryPart;
 
+    public ComplexNumber(){
+        this.realPart = new Fraction();
+        this.imaginaryPart = new Fraction();
+    }
+
     public ComplexNumber(Fraction realPart, Fraction imaginaryPart){
         this.realPart = realPart;
         this.imaginaryPart = imaginaryPart;
@@ -12,6 +17,11 @@ public class ComplexNumber implements VectorEntry<ComplexNumber>{
     public ComplexNumber(String realPartRepStr, String imaginaryPartStr){
         this.realPart = Fraction.parseFraction(realPartRepStr);
         this.imaginaryPart = Fraction.parseFraction(imaginaryPartStr);
+    }
+
+    public ComplexNumber(ComplexNumber other){
+        this.realPart = other.realPart.deepClone();
+        this.imaginaryPart = other.imaginaryPart.deepClone();
     }
 
     public void add(ComplexNumber other){
@@ -64,6 +74,10 @@ public class ComplexNumber implements VectorEntry<ComplexNumber>{
         Fraction real = new Fraction(this.realPart);
         ComplexNumber conjugate = new ComplexNumber(real, Fraction.multiply(this.imaginaryPart,f));
         return conjugate;
+    }
+
+    public ComplexNumber deepClone(){
+        return new ComplexNumber(this);
     }
 
     public String toString(){

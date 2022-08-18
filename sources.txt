@@ -1,0 +1,7 @@
+./Main.java
+./vectorentries/ComplexNumber.java
+./vectorentries/Fraction.java
+./vectorentries/VectorEntry.java
+./vectors/ColumnVector.java
+./vectors/Matrix.java
+./vectors/Vector.java

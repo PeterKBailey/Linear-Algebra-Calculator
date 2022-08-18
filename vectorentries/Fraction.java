@@ -4,14 +4,26 @@ public class Fraction implements VectorEntry<Fraction>{
     private int num;
     private int den;
 
+
+    public Fraction(){
+        this.num = 0;
+        this.den = 1;
+    }
     public Fraction(int num, int den){
+        if(den == 0)
+            throw new RuntimeException("Fraction can not have 0 for its denominator.");
         this.num = num;
         this.den = den;
+        this.reduce();
+    }
+    public Fraction(String representation){
+        this(Fraction.parseNum(representation), Fraction.parseDen(representation));
     }
     public Fraction(Fraction other){
-        this.num = other.num;
-        this.den = other.den;
+        this(other.num, other.den);
     }
+
+
 
     public void add(Fraction other){
         long lcm = (this.den * other.den) / this.gcd(this.den, other.den);
@@ -70,22 +82,38 @@ public class Fraction implements VectorEntry<Fraction>{
     }
 
     public String toString(){
+        if(this.den == 1)
+            return this.num + "";
         return this.num + "/" + this.den;
     }
 
-    public static Fraction parseFraction(String representation){
+    public Fraction deepClone(){
+        return new Fraction(this);
+    }
+
+    private static void verifyValidFraction(String representation){
         int barIndex = representation.indexOf('/');
-        if(barIndex == -1 || barIndex == 0 || barIndex == representation.length() -1)
+        if(barIndex == 0 || barIndex == representation.length() -1)
             throw new RuntimeException("Invalid Fraction: Must be formatted as 'num/den'");
+    }
+    private static int parseNum(String representation){
+        int barIndex = representation.indexOf('/');
+        if(barIndex == -1)
+            barIndex = representation.length();
+        return Integer.parseInt(representation.substring(0, barIndex));
+    }
+    private static int parseDen(String representation){
+        int barIndex = representation.indexOf('/');
+        return barIndex == -1 ? 1 : Integer.parseInt(representation.substring(barIndex+1));
+    }
 
-        String num = representation.substring(0, barIndex);
-        String den = representation.substring(barIndex+1);
-
-        return new Fraction(Integer.parseInt(num), Integer.parseInt(den));
+    public static Fraction parseFraction(String representation){
+        Fraction.verifyValidFraction(representation);
+        return new Fraction(Fraction.parseNum(representation), Fraction.parseDen(representation));
     }
 
     public void reduce(){
-        if(num == 0){
+        if(this.num == 0){
             this.den = 1;
             return;
         }
