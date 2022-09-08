@@ -1,33 +1,44 @@
+import java.util.ArrayList;
 import java.util.Random;
 
 import vectorentries.ComplexNumber;
 import vectorentries.Fraction;
+import vectorentries.VectorEntry;
 public class Main{
     public static void main(String[] args){
-        Fraction f = new Fraction(1,3);
-        System.out.println(f);
+        Fraction f = new Fraction(3,2);
+        Fraction f2 = new Fraction(4,3);
+        System.out.println(VectorEntry.add(f, f2));
 
-        ComplexNumber cn = new ComplexNumber("3/-2", "4/-1");
-        ComplexNumber cn2 = new ComplexNumber("12/1", "-1/1");
-        System.out.println(cn);
-        System.out.println(cn2);
-        cn.divideBy(cn2);
-        System.out.println(cn);
 
 
 
 
 
         Random r = new Random();
+        int vecSize = r.nextInt(5)+1;
+        ArrayList<Fraction> fractions = new ArrayList<Fraction>(vecSize);
+        ArrayList<Fraction> fractions2 = new ArrayList<Fraction>(vecSize);
 
-        Fraction fractions[] = new Fraction[r.nextInt(5)+1];
-        for(int i = 0; i < fractions.length; ++i){
+        for(int i = 0; i < vecSize; ++i){
             int num = r.nextInt(40) - 20;
             int den = r.nextInt(19) + 1;
-            fractions[i] = new Fraction(num, den);
+            fractions.add(new Fraction(num, den));
+
+            num = r.nextInt(40) - 20;
+            den = r.nextInt(19) + 1;
+            fractions2.add(new Fraction(num, den));
         }
-        ColumnVector<Fraction> cv = new ColumnVector<Fraction>(fractions);
-        System.out.println(cv);
+
+        ColumnVector<Fraction> cv1 = new ColumnVector<>(fractions);
+        ColumnVector<Fraction> cv2 = new ColumnVector<>(fractions2);
+
+        System.out.println("The first vector:");
+        System.out.println(cv1);
+        System.out.println("The second vector:");
+        System.out.println(cv2);
+        System.out.println("Their dot product:");
+        System.out.println(cv1.dotProduct(cv2));
 
         Fraction fractionMatrix[][] = new Fraction[r.nextInt(5)+1][r.nextInt(5)+1];
         for(Fraction[] row: fractionMatrix){

@@ -17,6 +17,7 @@ public class Matrix<V extends VectorEntry<V>> implements Vector<V>{
             }
         }
     }
+
     
     public void scalarMultiply(V multiple){
         for (ArrayList<V> row : vectorEntries) {
@@ -38,15 +39,6 @@ public class Matrix<V extends VectorEntry<V>> implements Vector<V>{
         return maxSize;
     }
 
-    public ColumnVector<V> toColumnVector(){
-        ArrayList<V> allEntries = new ArrayList<V>(vectorEntries.size()*vectorEntries.get(0).size());
-        for (ArrayList<V> row  : vectorEntries) {
-            for (V entry : row) {
-                allEntries.add(entry.deepClone());
-            }              
-        }
-        return new ColumnVector<V>(allEntries);
-    }
 
     public String toString(){
         String representation = "";

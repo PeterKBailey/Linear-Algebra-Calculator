@@ -37,11 +37,11 @@ public class ComplexNumber implements VectorEntry<ComplexNumber>{
     // (a + bi)(c + di) = ac + adi + bci + bdi^2 = ac - bd + (ad + bc)i
     // because i^2 = -1
     public void multiplyBy(ComplexNumber other){
-        Fraction realPart = Fraction.multiply(this.realPart, other.realPart);
-        realPart.subtract(Fraction.multiply(this.imaginaryPart, other.imaginaryPart));
+        Fraction realPart = VectorEntry.multiply(this.realPart, other.realPart);
+        realPart.subtract(VectorEntry.multiply(this.imaginaryPart, other.imaginaryPart));
 
-        Fraction imaginaryPart = Fraction.multiply(this.realPart, other.imaginaryPart);
-        imaginaryPart.add(Fraction.multiply(this.imaginaryPart, other.realPart));
+        Fraction imaginaryPart = VectorEntry.multiply(this.realPart, other.imaginaryPart);
+        imaginaryPart.add(VectorEntry.multiply(this.imaginaryPart, other.realPart));
 
         this.realPart = realPart;
         this.imaginaryPart = imaginaryPart;
@@ -72,7 +72,7 @@ public class ComplexNumber implements VectorEntry<ComplexNumber>{
     public ComplexNumber conjugateValue(){
         Fraction f = new Fraction (-1,1);
         Fraction real = new Fraction(this.realPart);
-        ComplexNumber conjugate = new ComplexNumber(real, Fraction.multiply(this.imaginaryPart,f));
+        ComplexNumber conjugate = new ComplexNumber(real, VectorEntry.multiply(this.imaginaryPart,f));
         return conjugate;
     }
 

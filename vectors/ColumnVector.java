@@ -1,5 +1,7 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 
+import vectorentries.Fraction;
 import vectorentries.VectorEntry;
 
 public class ColumnVector<V extends VectorEntry<V>> implements Vector<V>{
@@ -17,6 +19,7 @@ public class ColumnVector<V extends VectorEntry<V>> implements Vector<V>{
         }
     }
 
+    // for formatting purposes when printing to console
     private int longestEntry(){
         int maxSize = 0;
         for (V entry : vectorEntries) {
@@ -27,17 +30,30 @@ public class ColumnVector<V extends VectorEntry<V>> implements Vector<V>{
         return maxSize;
     }
 
-    public ColumnVector<V> toColumnVector(){
-        return this.clone();
-    }
-
-    public ColumnVector<V> clone(){
+    // To prevent side effects of certain operations
+    public ColumnVector<V> deepClone(){
         ArrayList<V> clonedEntries = new ArrayList<V>();
-        for (V entry : vectorEntries) {
+        for (V entry : this.vectorEntries) {
             clonedEntries.add(entry.deepClone());
         }
         return new ColumnVector<V>(clonedEntries);
     }
+
+    public V dotProduct(ColumnVector<V> other){
+        if(this.vectorEntries.size() < 1 || this.vectorEntries.size() != other.vectorEntries.size())
+            throw new RuntimeException("Cannot find the dot product between these vectors!");
+
+        // need a fresh generic to use
+        V outVal = this.vectorEntries.get(0).deepClone();
+        // set to 0
+        outVal.subtract(outVal);
+        for (int i = 0; i < this.vectorEntries.size(); ++i) {
+            V mult = VectorEntry.multiply(this.vectorEntries.get(i), other.vectorEntries.get(i));
+            outVal.add(mult);
+        }
+        return outVal;
+    }
+
 
     public String toString(){
         String representation = "";

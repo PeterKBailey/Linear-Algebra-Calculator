@@ -26,19 +26,18 @@ public class Fraction implements VectorEntry<Fraction>{
 
 
     public void add(Fraction other){
-        long lcm = (this.den * other.den) / this.gcd(this.den, other.den);
-
-        long tempNum = this.num * (this.den/lcm);
-        long tempOtherNum = other.num * (other.den/lcm);
+        long tempNum = this.num * (other.den);
+        long tempOtherNum = other.num * (this.den);
+        long den = this.den * other.den;
 
         tempNum += tempOtherNum;
 
         // if we've overflowed then throw an error
-        if(Math.abs(tempNum) > 2147483647 || Math.abs(lcm) > 2147483647)
+        if(Math.abs(tempNum) > 2147483647 || Math.abs(den) > 2147483647)
             throw new RuntimeException("Addition int overflow.");
         
         this.num = (int)tempNum;
-        this.den = (int)lcm;
+        this.den = (int)den;
         this.reduce();
     }
 
@@ -151,7 +150,7 @@ public class Fraction implements VectorEntry<Fraction>{
 
     // Static arithmetic functions for ease of use in multi-step equations
 
-    public static Fraction add(Fraction a, Fraction b){
+    /*public static Fraction add(Fraction a, Fraction b){
         Fraction ret = new Fraction(a.num, a.den);
         ret.add(b);
         return ret;
@@ -173,5 +172,5 @@ public class Fraction implements VectorEntry<Fraction>{
         Fraction ret = new Fraction(a.num, a.den);
         ret.divideBy(b);
         return ret;
-    }
+    }*/
 }
