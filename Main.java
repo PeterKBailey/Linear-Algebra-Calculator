@@ -1,9 +1,8 @@
 import java.util.ArrayList;
 import java.util.Random;
 
-import vectorentries.ComplexNumber;
-import vectorentries.Fraction;
-import vectorentries.VectorEntry;
+import vectorentries.*;
+import vectors.*;
 public class Main{
     public static void main(String[] args){
         Fraction f = new Fraction(3,2);
