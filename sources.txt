@@ -2,6 +2,6 @@
 ./vectorentries/ComplexNumber.java
 ./vectorentries/Fraction.java
 ./vectorentries/VectorEntry.java
-./vectors/ColumnVector.java
+./vectors/LinearVector.java
 ./vectors/Matrix.java
 ./vectors/Vector.java

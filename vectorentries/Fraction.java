@@ -1,87 +1,92 @@
 package vectorentries;
 
+import java.math.BigInteger;
+
 public class Fraction implements VectorEntry<Fraction>{
-    private int num;
-    private int den;
+    private BigInteger num;
+    private BigInteger den;
 
 
     public Fraction(){
-        this.num = 0;
-        this.den = 1;
+        this.num = BigInteger.valueOf(0);
+        this.den = BigInteger.valueOf(1);
     }
-    public Fraction(int num, int den){
-        if(den == 0)
+
+    public Fraction(BigInteger num, BigInteger den){
+        if(den.equals(BigInteger.ZERO))
             throw new RuntimeException("Fraction can not have 0 for its denominator.");
         this.num = num;
         this.den = den;
         this.reduce();
     }
-    public Fraction(String representation){
-        this(Fraction.parseNum(representation), Fraction.parseDen(representation));
+
+    public Fraction(long num, long den){
+        this(BigInteger.valueOf(num), BigInteger.valueOf(den));
     }
+
     public Fraction(Fraction other){
         this(other.num, other.den);
     }
 
-
+    public Fraction(String representation){
+        this(Fraction.parseFraction(representation));
+    }
 
     public void add(Fraction other){
-        long tempNum = this.num * (other.den);
-        long tempOtherNum = other.num * (this.den);
-        long den = this.den * other.den;
+        BigInteger tempNum = this.num.multiply(other.den);
+        BigInteger tempOtherNum = other.num.multiply(this.den);
 
-        tempNum += tempOtherNum;
+        this.den = this.den.multiply(other.den);
+        this.num = tempNum.add(tempOtherNum);
 
-        // if we've overflowed then throw an error
-        if(Math.abs(tempNum) > 2147483647 || Math.abs(den) > 2147483647)
-            throw new RuntimeException("Addition int overflow.");
-        
-        this.num = (int)tempNum;
-        this.den = (int)den;
         this.reduce();
     }
 
     public void subtract(Fraction other){
-        long lcm = (this.den * other.den) / this.gcd(this.den, other.den);
+        BigInteger lcm = (this.den.multiply(other.den)).divide(this.gcd(this.den, other.den));
 
-        long tempNum = this.num * (this.den/lcm);
-        long tempOtherNum = other.num * (other.den/lcm);
+        BigInteger tempNum = this.num.multiply(this.den.divide(lcm));
+        BigInteger tempOtherNum = other.num.multiply(other.den.divide(lcm));
 
-        tempNum -= tempOtherNum;
-
-        // if we've overflowed then throw an error
-        if(Math.abs(tempNum) > 2147483647 || Math.abs(lcm) > 2147483647)
-            throw new RuntimeException("Subtraction int overflow.");
-        
-        this.num = (int)tempNum;
-        this.den = (int)lcm;
+        this.num = tempNum.subtract(tempOtherNum);
+        this.den = lcm;
         this.reduce();
     }
 
     public void multiplyBy(Fraction other){
-        long numProduct = this.num * other.num;
-        long denProduct = this.den * other.den;
-        if(Math.abs(numProduct) > 2147483647 || Math.abs(denProduct) > 2147483647)
-            throw new RuntimeException("Multiplication int overflow");
-        
-        this.num = (int)numProduct;
-        this.den = (int)denProduct;
+        this.num = this.num.multiply(other.num);
+        this.den = this.den.multiply(other.den);
         this.reduce();
     }
 
     public void divideBy(Fraction other){
-        long numQuotient = this.num * other.den;
-        long denQuotient = this.den * other.num;
-        if(Math.abs(numQuotient) > 2147483647 || Math.abs(denQuotient) > 2147483647)
-            throw new RuntimeException("Division int overflow");
-        
-        this.num = (int)numQuotient;
-        this.den = (int)denQuotient;
+        this.num = this.num.multiply(other.den);
+        this.den = this.den.multiply(other.num);
         this.reduce();
     }
 
+    public boolean isEqualTo(Fraction other){
+        return this.num == other.num && this.den == other.den;
+    }
+
+    public boolean isZero(){
+        return this.num.equals(BigInteger.ZERO);
+    }
+    
+    public Fraction getReciprocal(){
+        if(this.isZero()) return new Fraction(0, 1);
+        return VectorEntry.divide(new Fraction("1/1"), (this));
+    }
+
+    public Fraction getInverse(){
+        Fraction inverse = new Fraction(this);
+        inverse.num = inverse.num.negate();
+        inverse.reduce();
+        return inverse;
+    }
+
     public String toString(){
-        if(this.den == 1)
+        if(this.den.equals(BigInteger.ONE))
             return this.num + "";
         return this.num + "/" + this.den;
     }
@@ -90,87 +95,60 @@ public class Fraction implements VectorEntry<Fraction>{
         return new Fraction(this);
     }
 
+    /**
+     * Throws a runtime exception if the string can not be parsed as a valid fraction
+     * @param representation the string representation of the fraction
+     */
     private static void verifyValidFraction(String representation){
-        int barIndex = representation.indexOf('/');
-        if(barIndex == 0 || barIndex == representation.length() -1)
-            throw new RuntimeException("Invalid Fraction: Must be formatted as 'num/den'");
-    }
-    private static int parseNum(String representation){
-        int barIndex = representation.indexOf('/');
-        if(barIndex == -1)
-            barIndex = representation.length();
-        return Integer.parseInt(representation.substring(0, barIndex));
-    }
-    private static int parseDen(String representation){
-        int barIndex = representation.indexOf('/');
-        return barIndex == -1 ? 1 : Integer.parseInt(representation.substring(barIndex+1));
+        if(!representation.matches("\\d+\\/?\\d+"))
+            throw new RuntimeException("Fraction must follow the format \"(int)/(int)\".");
     }
 
     public static Fraction parseFraction(String representation){
         Fraction.verifyValidFraction(representation);
-        return new Fraction(Fraction.parseNum(representation), Fraction.parseDen(representation));
+        int barIndex = representation.indexOf('/');
+
+        return new Fraction(
+            new BigInteger(representation.substring(0, barIndex)), 
+            new BigInteger(representation.substring(barIndex + 1))
+        );
     }
 
     public void reduce(){
-        if(this.num == 0){
-            this.den = 1;
+        if(this.num.equals(BigInteger.ZERO)){
+            this.den = BigInteger.ONE;
             return;
         }
 
-        boolean numBelow = num<0;
-        boolean denBelow = den<0;
-        int gcd = this.gcd(num, den);
+        boolean numBelow = num.compareTo(BigInteger.ZERO) == -1;
+        boolean denBelow = den.compareTo(BigInteger.ZERO) == -1;
+        BigInteger gcd = this.gcd(num, den);
 
-        num = num/gcd;
-        den = den/gcd;
+        num = num.divide(gcd);
+        den = den.divide(gcd);
 
         // If they're both negative, it divides out. 
         // If the den is negative and the num isn't then switch it
         if(numBelow&&denBelow||denBelow&&!numBelow){
-            num*=-1;
-            den*=-1;
+            num = num.negate();
+            den = den.negate();
         }
     }
 
     // Euclidean
-    private int gcd(int a, int b){
-        if(a == 0) return b;
+    private BigInteger gcd(BigInteger a, BigInteger b){
+        if(a.equals(BigInteger.ZERO)) return b;
 
-        a = Math.abs(a);
-        b = Math.abs(b);
+        a = a.abs();
+        b = b.abs();
 
-        while(b!=0){
-            if(a > b)
-                a -= b;
+        while(!b.equals(BigInteger.ZERO)){
+            // a > b
+            if(a.compareTo(b) == 1)
+                a = a.subtract(b);
             else
-                b -= a;
+                b = b.subtract(a);
         }
         return a;
     }
-
-    // Static arithmetic functions for ease of use in multi-step equations
-
-    /*public static Fraction add(Fraction a, Fraction b){
-        Fraction ret = new Fraction(a.num, a.den);
-        ret.add(b);
-        return ret;
-    }
-
-    public static Fraction subtract(Fraction a, Fraction b){
-        Fraction ret = new Fraction(a.num, a.den);
-        ret.subtract(b);
-        return ret;
-    }    
-    
-    public static Fraction multiply(Fraction a, Fraction b){
-        Fraction ret = new Fraction(a.num, a.den);
-        ret.multiplyBy(b);
-        return ret;
-    }
-    
-    public static Fraction divide(Fraction a, Fraction b){
-        Fraction ret = new Fraction(a.num, a.den);
-        ret.divideBy(b);
-        return ret;
-    }*/
 }

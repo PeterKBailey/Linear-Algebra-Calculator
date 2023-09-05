@@ -29,8 +29,8 @@ public class Main{
             fractions2.add(new Fraction(num, den));
         }
 
-        ColumnVector<Fraction> cv1 = new ColumnVector<>(fractions);
-        ColumnVector<Fraction> cv2 = new ColumnVector<>(fractions2);
+        LinearVector<Fraction> cv1 = new LinearVector<>(fractions);
+        LinearVector<Fraction> cv2 = new LinearVector<>(fractions2);
 
         System.out.println("The first vector:");
         System.out.println(cv1);
@@ -39,16 +39,30 @@ public class Main{
         System.out.println("Their dot product:");
         System.out.println(cv1.dotProduct(cv2));
 
-        Fraction fractionMatrix[][] = new Fraction[r.nextInt(5)+1][r.nextInt(5)+1];
-        for(Fraction[] row: fractionMatrix){
-            for(int i = 0; i < row.length; ++i){
+        int numRows = r.nextInt(2)+3;
+        int numCols = r.nextInt(2)+3;
+        ArrayList<LinearVector<Fraction>> fractionColumns = new ArrayList<LinearVector<Fraction>>(numCols);
+
+        // generate some new column vectors
+        for(int i = 0; i < numCols; ++i){
+            // come up with values
+            LinearVector<Fraction> col = new LinearVector<Fraction>();
+            for(int j = 0; j < numRows; ++j){
                 int num = r.nextInt(40) - 20;
                 int den = r.nextInt(19) + 1;
-                row[i] = new Fraction(num, den);
+                col.add(new Fraction(num, den));
             }
+            // System.out.println(new LinearVector<>(col));
+            fractionColumns.add(col);
         }
 
-        Matrix<Fraction> m = new Matrix<Fraction>(fractionMatrix);
+        Matrix<Fraction> m = new Matrix<Fraction>(fractionColumns, true);
+        System.out.println(m);
+        m.scalarMultiply(new Fraction(2, 1));
+        System.out.println(m);
+        m.rowSwap(0, 2);
+        System.out.println(m);
+        m.rowReduce();
         System.out.println(m);
     }
 }
