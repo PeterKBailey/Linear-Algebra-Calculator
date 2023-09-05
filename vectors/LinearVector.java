@@ -28,6 +28,10 @@ public class LinearVector<V extends VectorEntry<V>> implements Vector<V>, Iterab
     public boolean add(V element){
         return vectorEntries.add(element);
     }
+    
+    public V remove(int index){
+        return vectorEntries.remove(index);
+    }
 
     @Override
     public Iterator<V> iterator() {

@@ -1,5 +1,4 @@
 package vectors;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -233,6 +232,56 @@ public class Matrix<V extends VectorEntry<V>> implements Vector<V>{
             solutions.put("x" + pivot, equation);     
         }
         return solutions;
+    }
+
+    /**
+     * Calculates the determinant of this matrix
+     * @return the determinant, 0 if the matrix is NOT invertible
+     */
+    public V getDeterminant(){
+        if(this.rows.size() != this.columns.size()) throw new RuntimeException("Only square matrices have determinants.");
+
+        return this.getDeterminantHelper(this.deepClone());
+    }
+
+    // TODO: solve bottom up
+    private V getDeterminantHelper(Matrix<V> A){
+        // base case: determinant of 1x1 matrix is the single value
+        if(A.rows.size() == 1){
+            return A.columns.get(0).get(0);
+        }
+        // recursive case
+        else {
+            // Get a "zero" value to start the sum from
+            V sum = A.rows.get(0).get(0).getZero();
+            int multiplyer = 1;
+            // loop over each row in the first column
+            for(int rowIndex = 0; rowIndex < A.rows.size(); ++rowIndex){
+                // get the matrix which does not include the members in the same row or column as the current value
+                Matrix<V> subMatrix = getSmallerMatrix(0, rowIndex, A);
+                // recursive call for determinant of smaller matrix
+                V determinantVal = getDeterminantHelper(subMatrix);
+                if(multiplyer == -1) determinantVal = determinantVal.getNegation();
+
+                // add or subtract the product of the current value with the sub matrix determinant
+                sum.add(VectorEntry.multiply(A.columns.get(0).get(rowIndex), determinantVal));
+                multiplyer *= -1;
+            }
+            return sum;
+        }
+    }
+
+    private Matrix<V> getSmallerMatrix(int colIndex, int rowIndex, Matrix<V> A){
+        var clone = A.deepClone();
+        for(var column: clone.columns){
+            column.remove(rowIndex);
+        }
+        for(var row: clone.rows){
+            row.remove(colIndex);
+        }
+        clone.columns.remove(colIndex);
+        clone.rows.remove(rowIndex);
+        return clone;
     }
 
 
