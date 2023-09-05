@@ -1,9 +1,9 @@
 package vectors;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
-import javax.swing.RowFilter.Entry;
+import java.util.Map;
 
 import vectorentries.VectorEntry;
 
@@ -120,7 +120,7 @@ public class Matrix<V extends VectorEntry<V>> implements Vector<V>{
      * @param scalarMultiple the scalar multiple being applied to the row
      */
     public void rowScalarMultiply(int rowIndex, V scalarMultiple){
-        if(scalarMultiple.isZero()) throw new RuntimeException("The scalar multiple must be non zero!");
+        if(scalarMultiple.isEqualTo(scalarMultiple.getZero())) throw new RuntimeException("The scalar multiple must be non zero!");
         // multiply the values in the entire row
         // rows and columns point to the same VectorEntry so only need to do this operation once
         for(var entry: rows.get(rowIndex)){
@@ -181,8 +181,9 @@ public class Matrix<V extends VectorEntry<V>> implements Vector<V>{
     private boolean makePivotAt(int pivotColumnIndex, int pivotRowIndex){
         // starting from the pivot row, loop over each row
         for(int i = pivotRowIndex; i < rows.size(); ++i){
+            var entry = rows.get(i).get(pivotColumnIndex);
             // find first row with a value in the column
-            if(!rows.get(i).get(pivotColumnIndex).isZero()){
+            if(!entry.isEqualTo(entry.getZero())){
                 // row i has a value for this column, swap it up to row we want pivot in
                 if(i != pivotRowIndex)
                     rowSwap(pivotRowIndex, i);
@@ -191,13 +192,47 @@ public class Matrix<V extends VectorEntry<V>> implements Vector<V>{
                 for(int j = 0; j < rows.size(); ++j){
                     if(j == pivotRowIndex) continue;
                     // determine the ratio between the vals in both rows
-                    V multiple = rows.get(j).get(pivotColumnIndex).getInverse();
+                    V multiple = rows.get(j).get(pivotColumnIndex).getNegation();
                     rowAddMultiple(j, multiple, pivotRowIndex);
                 }
                 return true;
             }
         }
         return false;
+    }
+
+    public Map<String, String> getLinearEquationSolnSet(){
+        var solutions = new HashMap<String, String>();
+        var duplicateMatrix = this.deepClone();
+        duplicateMatrix.rowReduce();
+        // loop over each row to build up the solution set
+        for(int rowIndex = 0; rowIndex < duplicateMatrix.rows.size(); ++rowIndex){    
+            int pivot = -1;
+            String equation = duplicateMatrix.rows.get(rowIndex).get(duplicateMatrix.columns.size() -1).toString();
+            // for each entry along the row
+            for(int colIndex = 0; colIndex < duplicateMatrix.columns.size() - 1; ++colIndex){
+                var entry = duplicateMatrix.columns.get(colIndex).get(rowIndex);
+
+                // if this is the pivot
+                if(entry.isEqualTo(entry.getOne()) && pivot == -1){
+                    pivot = colIndex + 1;
+                }
+                // otherwise if non zero add to the eqn
+                else if(!entry.isEqualTo(entry.getZero())){
+                    String freeVar = "x" + (colIndex+1);
+                    equation += " + " + entry.getNegation() + freeVar;
+                    solutions.put(freeVar, "free");
+                }
+                
+            }
+            if(pivot == -1){
+                solutions.clear();
+                solutions.put("Row" + (rowIndex + 1), "inconsistent");
+                return solutions; 
+            }
+            solutions.put("x" + pivot, equation);     
+        }
+        return solutions;
     }
 
 

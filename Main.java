@@ -40,9 +40,12 @@ public class Main{
         System.out.println(cv1.dotProduct(cv2));
 
         int numRows = r.nextInt(2)+3;
+        numRows = 3;
         int numCols = r.nextInt(2)+3;
+        numCols = 4;
         ArrayList<LinearVector<Fraction>> fractionColumns = new ArrayList<LinearVector<Fraction>>(numCols);
 
+        /*
         // generate some new column vectors
         for(int i = 0; i < numCols; ++i){
             // come up with values
@@ -55,14 +58,30 @@ public class Main{
             // System.out.println(new LinearVector<>(col));
             fractionColumns.add(col);
         }
+*/
+        int[] values = {1,-2,5,-1,3,0,-1,2,-3,0,-2,4};
+        // int[] values = {1,0,0,0,1,0,2,-7,0,0,0,1};
+        int index = 0;
+        for(int i = 0; i < numCols; ++i){
+            // come up with values
+            LinearVector<Fraction> col = new LinearVector<Fraction>();
+            for(int j = 0; j < numRows; ++j){
+                col.add(new Fraction(values[index], 1));
+                index++;
+            }
+            fractionColumns.add(col);
+        }
 
         Matrix<Fraction> m = new Matrix<Fraction>(fractionColumns, true);
-        System.out.println(m);
+        // System.out.println(m);
         m.scalarMultiply(new Fraction(2, 1));
-        System.out.println(m);
+        // System.out.println(m);
         m.rowSwap(0, 2);
         System.out.println(m);
+        var m2 = m.deepClone();
         m.rowReduce();
         System.out.println(m);
+        var solns = m2.getLinearEquationSolnSet();
+        System.out.println(solns);
     }
 }

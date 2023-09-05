@@ -66,23 +66,27 @@ public class Fraction implements VectorEntry<Fraction>{
     }
 
     public boolean isEqualTo(Fraction other){
-        return this.num == other.num && this.den == other.den;
+        return this.num.equals(other.num) && this.den.equals(other.den);
     }
-
-    public boolean isZero(){
-        return this.num.equals(BigInteger.ZERO);
-    }
-    
+     
     public Fraction getReciprocal(){
-        if(this.isZero()) return new Fraction(0, 1);
+        if(this.isEqualTo(getZero())) return new Fraction(0, 1);
         return VectorEntry.divide(new Fraction("1/1"), (this));
     }
 
-    public Fraction getInverse(){
+    public Fraction getNegation(){
         Fraction inverse = new Fraction(this);
         inverse.num = inverse.num.negate();
         inverse.reduce();
         return inverse;
+    }
+
+    public Fraction getZero(){
+        return new Fraction(0,1);
+    }
+
+    public Fraction getOne(){
+        return new Fraction(1,1);
     }
 
     public String toString(){
@@ -100,8 +104,8 @@ public class Fraction implements VectorEntry<Fraction>{
      * @param representation the string representation of the fraction
      */
     private static void verifyValidFraction(String representation){
-        if(!representation.matches("\\d+\\/?\\d+"))
-            throw new RuntimeException("Fraction must follow the format \"(int)/(int)\".");
+        if(!representation.matches("\\d+(\\/\\d+)?"))
+            throw new RuntimeException("Fraction must follow the format int or \"(int)/(int)\".");
     }
 
     public static Fraction parseFraction(String representation){

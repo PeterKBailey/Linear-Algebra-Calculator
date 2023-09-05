@@ -68,20 +68,25 @@ public class ComplexNumber implements VectorEntry<ComplexNumber>{
         return this.realPart.isEqualTo(other.realPart) && this.imaginaryPart.isEqualTo(other.imaginaryPart);
     }
 
-    public boolean isZero(){
-        return this.realPart.isZero() && this.imaginaryPart.isZero();
-    }
-
     public ComplexNumber getReciprocal(){
         return VectorEntry.divide(new ComplexNumber("1/1", "0/1"), (this));
     }
 
-    public ComplexNumber getInverse(){
+    public ComplexNumber getNegation(){
         ComplexNumber inverse = new ComplexNumber(this);
-        inverse.realPart = inverse.realPart.getInverse();
-        inverse.imaginaryPart = inverse.imaginaryPart.getInverse();
+        inverse.realPart = inverse.realPart.getNegation();
+        inverse.imaginaryPart = inverse.imaginaryPart.getNegation();
         return inverse;
     }
+
+    public ComplexNumber getZero(){
+        return new ComplexNumber("0","0");
+    }
+
+    public ComplexNumber getOne(){
+        return new ComplexNumber("1","0");
+    }
+    
 
     public void conjugate(){
         Fraction f = new Fraction (-1,1);

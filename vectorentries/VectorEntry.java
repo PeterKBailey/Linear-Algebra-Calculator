@@ -7,9 +7,11 @@ public interface VectorEntry<T> extends DeepCloneable<T>{
     public void multiplyBy(T e);
     public void divideBy(T e);
     public boolean isEqualTo(T e);
-    public boolean isZero();
     public T getReciprocal();
-    public T getInverse();
+    public T getNegation();
+
+    public T getZero();
+    public T getOne();
 
     public static <T extends VectorEntry<T>> T add(T a, T b){
         T clone = a.deepClone();
